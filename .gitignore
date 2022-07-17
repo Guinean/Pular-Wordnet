@@ -2,7 +2,7 @@
 *.log
 
 # ignore ALL files in ANY directory named temp
-logs_and_outputs
+logs_and_outputs/
 
 .pular_venv/
 .vscode/
