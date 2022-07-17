@@ -1,0 +1,24 @@
+# ignore ALL .log files
+*.log
+
+# ignore ALL files in ANY directory named temp
+logs_and_outputs
+
+.pular_venv/
+.vscode/
+Fula_Dictionary-repaired.docx
+Pular-Wordnet/
+VSC-Workspace_PULAR.code-workspace
+changes to vscode configs.txt
+class based parser.ipynb
+dict_based_parser copy.ipynb
+dict_based_parser.ipynb
+git terminal commands.txt
+logs_and_outputs/
+pasted_docx page 1.docx
+pydantic_parser(first working but with unused code).ipynb
+pydantic_parser.ipynb
+pydantic_parser_weird.ipynb
+schema_draft_1.json
+schema_draft_2.json
+trying git.txt
