@@ -58,3 +58,18 @@
 // para_text='WOOP-  woopude  var.- woofude; V. woof- (1)  Dcz  C<FJ>,Z<FJ,FT>', 
 // run_text=['WOOP-  ', 'woopude  ', 'var.- woofude; V. woof- (1)  ', 'Dcz  C<FJ>,Z<FJ,FT>'], 
 // run_font_size_pt=[12.0, None, None, 8.0])")
+
+
+
+
+// 2022-07-19 09:41:06,781 paragraph#   -ONDIR- with text ""   -ONDIR-"" had leading whitespace removed
+// 2022-07-19 09:41:06,783 paragraph#		hakkundewol mbeɗu (T): diameter ; diamètre with text ""		hakkundewol mbeɗu (T): diameter ; diamètre"" had a run with ONLY whitespace
+// 2022-07-19 09:41:06,783 paragraph#		hakkundewol mbeɗu (T): diameter ; diamètre with text ""		hakkundewol mbeɗu (T): diameter ; diamètre"" had leading whitespace removed
+// 2022-07-19 09:41:06,784 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,786 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,787 paragraph#  -IN- with text ""  -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,787 paragraph#   -IƊ- with text ""   -IƊ-"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -IN-D-IN with text ""   -IN-D-IN"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -ONDIR- with text ""   -ONDIR-"" had leading whitespace removed
+// 2022-07-19 09:41:06,789 paragraph#   +HANŊKI with text ""   +HANŊKI"" had leading whitespace removed
