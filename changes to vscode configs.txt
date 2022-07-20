@@ -1,0 +1,12 @@
+Configure Pylance🔗
+
+With the default configurations, you will get support for autocompletion, but Pylance might not check for type errors.
+
+You can enable type error checks from Pylance with these steps:
+    Open the "User Settings"
+    Search for Type Checking Mode
+    You will find an option under Python › Analysis: Type Checking Mode
+    Set it to basic or strict (by default it's off)
+https://pydantic-docs.helpmanual.io/visual_studio_code/
+ ---
+CHANGED: Editor format on type -> on

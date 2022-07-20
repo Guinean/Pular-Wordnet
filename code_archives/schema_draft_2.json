@@ -1,0 +1,24 @@
+[
+   {
+      "entity_word":"",
+      "features":{},
+      "paragraphs_list":[],
+      ".paragraphs":[
+         {
+            ".text": "??",
+            ".paragraph_format.first_line_indent": "",
+            ".paragraph_format.left_indent": "",
+            ".runs": [],
+            "runs_groups_indexes": [],
+            "run.text":[],
+            "run.font.name": [],
+            "run.font.size.pt":[],
+            "run.bold": [],
+            "run.italic":[]
+         },
+      ],
+      "sub_roots":[],
+      "lemmas":[]
+   }
+      
+]

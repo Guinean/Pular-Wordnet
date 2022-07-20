@@ -1,0 +1,37 @@
+git config --global user.email pngardne@umich.edu
+git config --global user.name Guinean
+git config --global core.editor "code --wait"
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd "code --wait $MERGED"
+
+
+
+git commit -m "added command list text file" demo2.py terminal_commands.txt demo2.py
+    git commit -m "updated commands file" terminal_commands.txt
+git add .
+    this adds everything to stage, but can be dangerous, and generally doesn't enforce the awareness we want
+git commit -a???
+    git commit -a -m "trying commit - a again with check changes"
+    this commits everything (-a) and -m lets me add a message.
+    but this does not commit files that have not already been added! ie "Unstaged"
+git log -p
+    this shows the commit history in detail, with diffs between files
+git ls-tree -r main
+    shows all files in "main" branch
+git checkout -b main
+    checks out main branch
+
+git config --global user.email "pngardne@umich.edu"
+git config --global user.name "Peter Gardner"
+
+#git config --global user.nickname "Guinean"
+To do
+    how to branch, merge, and be confident working in a separate space because 
+        |when I checked out main all my working files seemed to get added. 
+        |And normally I reeeeally wouldnt want that default
+    
+
+git config --global core.autocrlf true
+git config --system core.autocrlf true
+git config --local core.autocrlf true
+git config core.autocrlf true

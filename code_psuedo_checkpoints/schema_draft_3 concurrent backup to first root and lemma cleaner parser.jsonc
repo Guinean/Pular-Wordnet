@@ -1,0 +1,75 @@
+{
+   "$schema": [
+      {
+         "entity_word":"",
+         "features":{},
+         "paragraphs_list":[],
+         ".paragraphs":[
+            {
+               "paragraph_enumeration": 0,
+               "para_text": "", //str = Field(..., min_length = 1) ##required, must be string, must be 1 long or more
+               "para_first_line_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+               "para_left_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+               // ".runs": [],
+               "runs_groups_indexes": [],
+               "run_text" : [], // List[Any],
+               "run_font_name" : [], // List[Any],
+               "run_font_size_pt" : [], // List[Any],
+               "run_bold" : [], // List[Any],
+               "run_italic" : [] // List[Any]
+
+            }
+         ],
+         "sub_roots":[],
+         "lemmas":[]
+      }   
+   ],
+   "error_msg":{
+         "schema_assumption_violations":{
+            "lemmas":[
+               "warning |identify_lemma||para# {enumeration}| paragraph with bold text, but not in run #1",
+               "info    |identify_lemma||para# {enumeration}| paragraph with bold in multiple runs. #AUDIT these are resolved after aggregation",
+               "error   |identify_lemma| this should never happen. |para#{enumeration}|"
+            ]
+         }
+   }
+}
+// # Test messages
+// # logger.debug("Harmless debug Message") # level 10
+// # logger.info("Just an information") #20
+// # logger.warning("Its a Warning") #30
+// # logger.error("Did you try to divide by zero") #40
+// # logger.critical("Internet is down")  #50
+
+// run_text : List[Any] = Field(...) #Required, must be list
+// run_font_name : List[Any] = Field(...) #Required, must be list
+// run_font_size_pt : List[Any] = Field(...) #Required, must be list
+// run_bold : List[Any] = Field(...) #Required, must be list
+// run_italic : List[Any] = Field(...) #Required, must be list
+
+// para_text: str = Field(..., min_length = 1) ##required, must be string, must be 1 long or more
+// para_first_line_indent: Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+// para_left_indent: Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+
+// "docx_Paragraph_and_Runs(
+// run_italic=[None, None, True, None], 
+// run_font_name=[None, 'TmsRmn 10pt', 'TmsRmn 10pt', 'Helv 8pt'], 
+// run_bold=[None, True, None, None], 
+// para_text='WOOP-  woopude  var.- woofude; V. woof- (1)  Dcz  C<FJ>,Z<FJ,FT>', 
+// run_text=['WOOP-  ', 'woopude  ', 'var.- woofude; V. woof- (1)  ', 'Dcz  C<FJ>,Z<FJ,FT>'], 
+// run_font_size_pt=[12.0, None, None, 8.0])")
+
+
+
+
+// 2022-07-19 09:41:06,781 paragraph#   -ONDIR- with text ""   -ONDIR-"" had leading whitespace removed
+// 2022-07-19 09:41:06,783 paragraph#		hakkundewol mbeɗu (T): diameter ; diamètre with text ""		hakkundewol mbeɗu (T): diameter ; diamètre"" had a run with ONLY whitespace
+// 2022-07-19 09:41:06,783 paragraph#		hakkundewol mbeɗu (T): diameter ; diamètre with text ""		hakkundewol mbeɗu (T): diameter ; diamètre"" had leading whitespace removed
+// 2022-07-19 09:41:06,784 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,786 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,787 paragraph#  -IN- with text ""  -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,787 paragraph#   -IƊ- with text ""   -IƊ-"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -IN- with text ""   -IN-"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -IN-D-IN with text ""   -IN-D-IN"" had leading whitespace removed
+// 2022-07-19 09:41:06,788 paragraph#   -ONDIR- with text ""   -ONDIR-"" had leading whitespace removed
+// 2022-07-19 09:41:06,789 paragraph#   +HANŊKI with text ""   +HANŊKI"" had leading whitespace removed

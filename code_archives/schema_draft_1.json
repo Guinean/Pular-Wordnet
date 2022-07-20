@@ -1,0 +1,133 @@
+[
+   {//integer index... roots
+      "_root_txt":"",
+      "paras_lst": [],
+      "paragraphs": [
+         {
+            ".text": "??",
+            ".paragraph_format.first_line_indent": "",
+            ".paragraph_format.left_indent": "",
+            ".runs": [],
+            "runs_groups_indexes": [],
+            "run.text":[],
+            "run.font.name": [],
+            "run.font.size.pt":[],
+            "run.bold": [],
+            "run.italic":[]
+         }
+      ],
+      "sub_roots":[
+         {//integer index... subroots
+            "_root_txt":"",
+            "paras_lst": [],
+            "paragraphs": [
+               {
+                  ".text": "??",
+                  ".paragraph_format.first_line_indent": "",
+                  ".paragraph_format.left_indent": "",
+                  ".runs": [],
+                  "runs_groups_indexes": [],
+                  "run.text":[],
+                  "run.font.name": [],
+                  "run.font.size.pt":[],
+                  "run.bold": [],
+                  "run.italic":[]
+               }
+            ],
+            "lemmas":[
+               {//integer index... lemmas
+                  "_lemma_txt": "@#$%",
+                  "??Entity_Text??": "??",
+                  "features":{
+                     "_full_root":[],
+                     "Fula_Lemma":"",
+                     "Fula_POS_Tags":""
+                  },
+                  "paras_lst": [],
+                  "paragraphs": [
+                     {
+                        ".text": "??",
+                        ".paragraph_format.first_line_indent": "",
+                        ".paragraph_format.left_indent": "",
+                        ".runs": [],
+                        "runs_groups_indexes": [],
+                        "run.text":[],
+                        "run.font.name": [],
+                        "run.font.size.pt":[],
+                        "run.bold": [],
+                        "run.italic":[]
+                     }
+                  ]
+               }
+            ]
+         }
+      ],
+      "lemmas":[
+         {//integer index... lemmas
+            "_lemma_txt": "@#$%",
+            "??Entity_Text??": "??",
+            "features":{
+               "_full_root":[],
+               "Fula_Lemma":"",
+               "Fula_POS_Tags":""
+            },
+            "paras_lst": [],
+            "paragraphs": [
+               {
+                  ".text": "??",
+                  ".paragraph_format.first_line_indent": "",
+                  ".paragraph_format.left_indent": "",
+                  ".runs": [],
+                  "runs_groups_indexes": [],
+                  "run.text":[],
+                  "run.font.name": [],
+                  "run.font.size.pt":[],
+                  "run.bold": [],
+                  "run.italic":[]
+               }
+            ]
+         }
+      ]
+   }
+]
+// schema summary
+{
+   "INTEGER index_for_entity":{ //root
+      "STRING entity":"",
+      "...any subsidiary non-entity content":"...",
+      "sub_roots":{
+         "INTEGER index_for_entity":{ //sub_root
+            "STRING entity":"",
+            "...any subsidiary non-entity content":"...",
+            "lemmas":{
+      
+            }
+         }
+      }
+   }
+}
+
+[
+   { //integer index... root|subroot|lemma
+      "entity_word":"",
+      "features":{},
+      "paragraphs_list":[],
+      ".paragraphs":[
+         {
+            ".text": "??",
+            ".paragraph_format.first_line_indent": "",
+            ".paragraph_format.left_indent": "",
+            ".runs": [],
+            "runs_groups_indexes": [],
+            "run.text":[],
+            "run.font.name": [],
+            "run.font.size.pt":[],
+            "run.bold": [],
+            "run.italic":[]
+         },
+      ],
+      "sub_roots":[],
+      "lemmas":[]
+   }
+      
+]

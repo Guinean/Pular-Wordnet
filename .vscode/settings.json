@@ -1,0 +1,9 @@
+{
+   "python.defaultInterpreterPath": "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\python.exe",
+   // "python.pythonPath": "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\python.exe",
+   // "python.terminal.activateEnvironment": true,
+   // "python.terminal.activateEnvInCurrentTerminal": true,
+   // "python.terminal.executeInFileDir": true,
+   // "terminal.integrated.shellArgs.windows": [ "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\activate" ],
+   // "terminal.integrated.shell.windows": "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\Activate.ps1"
+}
