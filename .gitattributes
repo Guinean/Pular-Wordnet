@@ -1,3 +1,6 @@
+# *.docx diff=word https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes
+#^^ this would need docx2text package be configured as the diff tool. #TODO
+
 ###############################
 # Git Line Endings            # https://rehansaeed.com/gitattributes-best-practices/#line-endings
 ###############################
