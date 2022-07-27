@@ -11,7 +11,7 @@
                "para_first_line_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
                "para_left_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
                // ".runs": [],
-               "runs_groups_indexes": [],
+               // "runs_groups_indexes": [],
                "run_text" : [], // List[Any],
                "run_font_name" : [], // List[Any],
                "run_font_size_pt" : [], // List[Any],
@@ -32,8 +32,8 @@
                "error   |identify_lemma| this should never happen. |para#{enumeration}|"
             ]
          }
-   }
-}
+   },
+
 // # Test messages
 // # logger.debug("Harmless debug Message") # level 10
 // # logger.info("Just an information") #20
@@ -73,3 +73,26 @@
 // 2022-07-19 09:41:06,788 paragraph#   -IN-D-IN with text ""   -IN-D-IN"" had leading whitespace removed
 // 2022-07-19 09:41:06,788 paragraph#   -ONDIR- with text ""   -ONDIR-"" had leading whitespace removed
 // 2022-07-19 09:41:06,789 paragraph#   +HANŊKI with text ""   +HANŊKI"" had leading whitespace removed
+
+
+"$schema2":{
+      "entity_word":"",
+      "features":{},
+      "paragraphs_list":[],
+      ".paragraphs":[
+         {
+            "paragraph_enumeration": 0,
+            "para_text": "", //str = Field(..., min_length = 1) ##required, must be string, must be 1 long or more
+            "para_first_line_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+            "para_left_indent": 0, //Optional[int] = Field(...) #Required, but must be int OR none. https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields 
+            "run_text" : [], // List[constr],
+            "run_font_name" : [], // List[Optional[str]],
+            "run_font_size_pt" : [], // List[Optional[float]],
+            "run_bold" : [], // List[Optional[bool]],
+            "run_italic" : [] // List[Optional[bool]]
+         }
+      ],
+      "sub_roots":[],
+      "lemmas":[]
+   }   
+}
