@@ -112,3 +112,4 @@ for line in read_data:
 synsetFile.close()
 unconnectedFile.close()
 print('Done with {} matches and {} unconnected entries, of which {} have 1.0 confidence score.'.format(matched, unmatched, matched100))
+
