@@ -7,7 +7,8 @@ from typing import Optional, Dict, List, Any, Union, Tuple
 from pydantic import BaseModel, root_validator, Field
 import logging
 from itertools import tee
-
+import docx
+from docx import Document
 import numpy as np
 
 
