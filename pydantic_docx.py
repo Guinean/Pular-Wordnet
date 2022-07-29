@@ -12,7 +12,7 @@ import numpy as np
 
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 ## Docx Pydantic Classes
 ### Helper Functions
