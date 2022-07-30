@@ -405,7 +405,7 @@ class Docx_Paragraph_and_Runs (BaseModel):
 #    lemmas : List['Fula_Entry'] = [] #self reference
 
 
-def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Optional[Dict[str,List[Any]]]:
+def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Optional[Dict[str,list]]:
    """takes a docx filepath, parses it with python-docx, then parses the docx paragraphs into Pydantic Dataclasses declared in this file
    'output_file' path may be passed to pickle the output instead of returning it in a dict of lists
    Has ability to somewhat control error handling of the pydantic classes, but this is not fully implemented as of 2022/07/30
@@ -416,7 +416,7 @@ def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Opti
    char_counts: Any = Counter()
    docx_object_list = []
    parsed_object_list = []
-   failed_paras_ind = [] #: List[Optional[Tuple[int,Any,BaseException]]]= []
+   failed_paras_ind = [] #: List[Optional[Tuple[int,Docx_Paragraph_and_Runs,Any]]] = [] #: List[Optional[Tuple[int,Any,BaseException]]]= []
    handled_errors = []
 
    for i, para in enumerate(document.paragraphs):
@@ -434,8 +434,8 @@ def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Opti
             if err['msg'] in suppress['msg']:
                handled_errors.append((i,para))
                pass
-      except BaseException as e:
-         failed_paras_ind.append((i,para,e))
+      except BaseException as e: #type: ignore
+         failed_paras_ind.append((i,para))
          # raise e
    assert len(docx_object_list) == len(parsed_object_list) + len(handled_errors) + len(failed_paras_ind)
          
@@ -445,24 +445,19 @@ def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Opti
    # print('failed paras: ',len(failed_paras_ind))
    a:list = [4,3,4]
    #output logic
-   
+   outcomes_dict = {}
    if output_file is not None:
    #    # Open a file and use dump()
       with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
-         outcomes_dict = {}
          outcomes_dict['parsed_object_list'] = parsed_object_list
-         # outcomes_dict['docx_object_list'] = docx_object_list
-         outcomes_dict['handled_errors'] = handled_errors
-         outcomes_dict['failed_paras_ind'] = failed_paras_ind
+         outcomes_dict['handled_errors'] = handled_errors #type: ignore
+         outcomes_dict['failed_paras_ind'] = failed_paras_ind #type: ignore
          outcomes_dict['char_counts'] = char_counts
-
-         
          pickle.dump(outcomes_dict, file)
          return None
    else:
-         outcomes_dict = {}
+         
          outcomes_dict['parsed_object_list'] = parsed_object_list
-         # outcomes_dict['docx_object_list'] = docx_object_list
          outcomes_dict['handled_errors'] = handled_errors
          outcomes_dict['failed_paras_ind'] = failed_paras_ind
          outcomes_dict['char_counts'] = char_counts
