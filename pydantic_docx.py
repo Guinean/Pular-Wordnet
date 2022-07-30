@@ -229,6 +229,14 @@ class Docx_Paragraph_and_Runs (BaseModel):
       #    print("no para_text with:\n\t", self.dict())
       return t
 
+   # def get_run_text(self) -> Optional[List[str]]:
+   #    run_texts = getattr(self,"run_text",None)
+   #    if run_texts is not None:
+   #       return run_texts
+   #    else:
+   #       logger.warning('interogator did not find run_text')
+   #       return None
+
    def paragraph_logger(self,level:int,msg:str,print_bool:bool):
       if print_bool:
          print(msg)
