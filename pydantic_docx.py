@@ -4,12 +4,17 @@
 #%pip install mypy
 # %pip install numpy
 from typing import Optional, Dict, List, Any, Union, Tuple
-from pydantic import BaseModel, root_validator, Field
+from pydantic import BaseModel, root_validator, Field, ValidationError
 import logging
 from itertools import tee
 import docx
 from docx import Document
 import numpy as np
+from itertools import compress, chain
+import re
+from collections import Counter
+import string
+import pickle
 
 
 
@@ -18,12 +23,16 @@ logger = logging.getLogger(__name__)
 ## Docx Pydantic Classes
 ### Helper Functions
 def pairwise(iterable):
-    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    '''mimic of itertools function not yet present in python 3.7.8
+    pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    '''
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
     
 def logger_root_validation_error_messages(e, logger_details, suppress = [], run_enumeration: Optional[int] = None) -> Union[RuntimeError, TypeError]:      
+   '''logger control for pydantic classes. Provides the ability to suppress certain validation errors, while still having the option to log them
+   '''
    #TODO add ability to handle assertion errors
    if run_enumeration is not None:
       run_num = f"|run#{run_enumeration}|" #type: ignore 
@@ -42,14 +51,19 @@ def logger_root_validation_error_messages(e, logger_details, suppress = [], run_
       return RuntimeError("non-validation error")
    return RuntimeError("non-validation error")
 
-def pular_str_strip_check(s:str) ->bool:
+def str_strip_check(s:str) ->bool:#TODO, check if this is really needed?
+   '''returns a boolean for if the input string would have characters removed by str.strip() 
+   '''
    in_len = len(s)
    new_s = s.strip()
    out_len = len(new_s)
    purported_whitespace: bool = in_len != out_len
    return purported_whitespace
 
-def closest(ranger, target): #any target indeces occuring before the first ranger index will be ignored
+def closest(ranger, target): 
+   '''#any target indeces occuring before the first ranger index will be ignored
+   if ind target == ind ranger, that target will still be nested under that ranger
+   '''
    if not isinstance(target,np.ndarray):
       target = np.array(target)
    for a,b in ranger:
@@ -389,3 +403,70 @@ class Docx_Paragraph_and_Runs (BaseModel):
 #    paragraphs_extr : List[Docx_Paragraph_and_Runs] #class defined above
 #    sub_roots : List['Fula_Entry'] = [] #self reference
 #    lemmas : List['Fula_Entry'] = [] #self reference
+
+
+def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Optional[Dict[str,list]]:
+   '''takes a docx filepath, parses it with python-docx, then parses the docx paragraphs into Pydantic Dataclasses declared in this file
+   'output_file' path may be passed to pickle the output instead of returning it in a dict of lists
+   Has ability to somewhat control error handling of the pydantic classes, but this is not fully implemented as of 2022/07/30
+   '''
+   #TODO add control logic for error tolerance/control
+   document = Document(docx_filename)
+
+   char_counts = Counter()
+   docx_object_list = []
+   parsed_object_list = []
+   failed_paras_ind = []
+   handled_errors = []
+
+   for i, para in enumerate(document.paragraphs):
+      docx_object_list.append((i,para))
+      try:
+         entryObj = Docx_Paragraph_and_Runs(**{'paragraph': para, 'paragraph_enumeration': i})
+         char_counts.update(entryObj.interogate__para_text())
+         parsed_object_list.append((i,entryObj))
+      except ValidationError as e:
+         suppress = {
+               # 'type': ['value_error.any_str.min_length'], #ignore zero length run_text, per run validator
+               'msg': ['suppressed Validation Error'] #ignore suppressed errors earlier/lower in the stack      
+         }
+         for err in e.errors():
+            if err['msg'] in suppress['msg']:
+               handled_errors.append((i,para))
+               pass
+      except BaseException as e:
+         failed_paras_ind.append((i,para,e))
+         # raise e
+   assert len(docx_object_list) == len(parsed_object_list) + len(handled_errors) + len(failed_paras_ind)
+         
+   # print('total paras: ',len(docx_object_list))
+   # print('parsed paras: ',len(parsed_object_list))
+   # print('handled errors: ',len(handled_errors))
+   # print('failed paras: ',len(failed_paras_ind))
+
+   #output logic
+   outcomes_dict = {}
+   if output_file is not None:
+      # Open a file and use dump()
+      with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
+         outcomes_dict['parsed_object_list'] = parsed_object_list
+         # outcomes_dict['docx_object_list'] = docx_object_list
+         outcomes_dict['handled_errors'] = handled_errors
+         outcomes_dict['failed_paras_ind'] = failed_paras_ind
+         outcomes_dict['char_counts'] = char_counts
+         pickle.dump(outcomes_dict, file)
+         return None
+   else:
+         outcomes_dict['parsed_object_list'] = parsed_object_list
+         # outcomes_dict['docx_object_list'] = docx_object_list
+         outcomes_dict['handled_errors'] = handled_errors
+         outcomes_dict['failed_paras_ind'] = failed_paras_ind
+         outcomes_dict['char_counts'] = char_counts
+         return outcomes_dict
+
+
+if __name__ == '__main__':
+   # docx_filename = "Fula_Dictionary-repaired.docx"
+   docx_filename = "pasted_docx page 1.docx"
+   print(len(docx2Pydantic(docx_filename)))
+   
