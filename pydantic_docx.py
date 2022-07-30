@@ -10,10 +10,10 @@ from itertools import tee
 import docx
 from docx import Document
 import numpy as np
-from itertools import compress, chain
-import re
+# from itertools import compress, chain
+# import re
 from collections import Counter
-import string
+# import string
 import pickle
 
 
@@ -405,18 +405,18 @@ class Docx_Paragraph_and_Runs (BaseModel):
 #    lemmas : List['Fula_Entry'] = [] #self reference
 
 
-def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Optional[Dict[str,list]]:
-   '''takes a docx filepath, parses it with python-docx, then parses the docx paragraphs into Pydantic Dataclasses declared in this file
+def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Optional[Dict[str,List[Any]]]:
+   """takes a docx filepath, parses it with python-docx, then parses the docx paragraphs into Pydantic Dataclasses declared in this file
    'output_file' path may be passed to pickle the output instead of returning it in a dict of lists
    Has ability to somewhat control error handling of the pydantic classes, but this is not fully implemented as of 2022/07/30
-   '''
+   """
    #TODO add control logic for error tolerance/control
    document = Document(docx_filename)
 
-   char_counts = Counter()
+   char_counts: Any = Counter()
    docx_object_list = []
    parsed_object_list = []
-   failed_paras_ind = []
+   failed_paras_ind = [] #: List[Optional[Tuple[int,Any,BaseException]]]= []
    handled_errors = []
 
    for i, para in enumerate(document.paragraphs):
@@ -443,20 +443,24 @@ def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Opti
    # print('parsed paras: ',len(parsed_object_list))
    # print('handled errors: ',len(handled_errors))
    # print('failed paras: ',len(failed_paras_ind))
-
+   a:list = [4,3,4]
    #output logic
-   outcomes_dict = {}
+   
    if output_file is not None:
-      # Open a file and use dump()
+   #    # Open a file and use dump()
       with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
+         outcomes_dict = {}
          outcomes_dict['parsed_object_list'] = parsed_object_list
          # outcomes_dict['docx_object_list'] = docx_object_list
          outcomes_dict['handled_errors'] = handled_errors
          outcomes_dict['failed_paras_ind'] = failed_paras_ind
          outcomes_dict['char_counts'] = char_counts
+
+         
          pickle.dump(outcomes_dict, file)
          return None
    else:
+         outcomes_dict = {}
          outcomes_dict['parsed_object_list'] = parsed_object_list
          # outcomes_dict['docx_object_list'] = docx_object_list
          outcomes_dict['handled_errors'] = handled_errors
@@ -468,5 +472,7 @@ def docx2Pydantic(docx_filename:str , output_file: Optional[str] = None) -> Opti
 if __name__ == '__main__':
    # docx_filename = "Fula_Dictionary-repaired.docx"
    docx_filename = "pasted_docx page 1.docx"
-   print(len(docx2Pydantic(docx_filename)))
+   parsed_to_dict = docx2Pydantic(docx_filename)
+   if parsed_to_dict is not None:
+      print(len(parsed_to_dict))
    
