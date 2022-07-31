@@ -1,5 +1,5 @@
 import pydantic
-from pydantic_docx import Docx_Paragraph_and_Runs, read_docx #type:ignore
+from pydantic_docx import Docx_Paragraph_and_Runs, read_docx, closest, pairwise #type:ignore
 import re
 import logging
 from itertools import chain, compress
@@ -21,6 +21,7 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
    root_and_lemma_one_line = []
    root_lookup = {}
    lemma_lookup = {}
+   normal_para_ind_list = []
    # pos_lookup = {}
    # pos_ind_list = []
 
@@ -113,6 +114,9 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
          if is_lemma and is_root:
             # print(f'this para# {i} has BOTH lemma AND root')
             root_and_lemma_one_line.append(i)
+         if not any([is_lemma, is_root]):
+            normal_para_ind_list.append(i)
+         
 
       except BaseException as e:
          
@@ -148,6 +152,10 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
    outcomes_dict['lemma_lookup'] = lemma_lookup
    # outcomes_dict['pos_lookup'] = pos_lookup
    outcomes_dict['char_counts'] = char_counts
+   outcomes_dict['normal_para_ind_list'] = normal_para_ind_list
+
+
+
    return outcomes_dict
 
 # def create_frame(content: Dict[str,Any], heirarchy:List[str]):
