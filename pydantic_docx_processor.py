@@ -67,12 +67,12 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
          is_root, (root_mask,run_text), _ = entryObj.single_run_feature_identify(featureConfig['root'])
          if is_root:
             rtext = ''.join(chain(compress(run_text,root_mask))).strip()
-            root_lookup[i] = (rtext,root_mask)
+            root_lookup[i] = (rtext,root_mask,run_text)
             #routine to distinguish between main root and subroot
             for j, r in enumerate(compress(run_text,root_mask)): 
                if j==0:
                   # low_alph_chars = ''.join([x.lower() for x in char_counts.keys() if x.upper() != x.lower()]) #only uppercase alphabetical chars
-                  up_alph_chars = ''.join([x.upper() for x in char_counts.keys() if x.upper() != x.lower()]) #only uppercase alphabetical chars #type: ignore
+                  # up_alph_chars = ''.join([x.upper() for x in char_counts.keys() if x.upper() != x.lower()]) #only uppercase alphabetical chars #type: ignore
                   root_note_chars = '-+()? ' #characters that encode the author's notes
                   sub_root_beginnings = '-+('
                   permissive_root_contents = ''.join(list(chain(up_alph_chars,root_note_chars,string.digits)))
@@ -96,7 +96,7 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
             # print(lemma_mask,run_text)
             ltext = ''.join(chain(compress(run_text,lemma_mask))).strip()
             # print(ltext)
-            lemma_lookup[i] = (ltext, lemma_mask)
+            lemma_lookup[i] = (ltext, lemma_mask,run_text)
             # paraText = entryObj.interogate__para_text()
             # print('\t\tp#',i,'\t\t',paraText)
             lemma_ind_list.append(i)
