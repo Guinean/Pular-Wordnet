@@ -1,5 +1,22 @@
 {
    "python.defaultInterpreterPath": "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\python.exe",
+   "python.linting.mypyEnabled": true,
+   "python.linting.mypyArgs": [
+      "--follow-imports=silent",
+      "--ignore-missing-imports",
+      "--show-column-numbers",
+      "--no-pretty",
+      "--plugins = pydantic.mypy",
+      "--follow_imports = silent",
+      "--warn_redundant_casts = True",
+      "--warn_unused_ignores = True",
+      "--disallow_any_generics = True",
+      "--check_untyped_defs = True",
+      "--no_implicit_reexport = True",
+
+      // for strict mypy: (this is the tricky one :-))
+      "--disallow_untyped_defs = True",
+   ],
    // "python.pythonPath": "C:\\Users\\peter\\VSC-Workspace_PULAR\\.pular_venv\\Scripts\\python.exe",
    // "python.terminal.activateEnvironment": true,
    // "python.terminal.activateEnvInCurrentTerminal": true,
