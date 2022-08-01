@@ -196,23 +196,23 @@ if __name__ == '__main__':
 
    parsed_to_dict = read_docx(docx_filename)
    parsed_object_list = parsed_to_dict['parsed_object_list']
-   doc_para_count: int = int(parsed_to_dict['total_encountered_paragraphs']) #type: ignore
+   doc_para_count: int = parsed_to_dict['total_encountered_paragraphs'][0] #type: ignore
    char_counts: Counter = parsed_to_dict['char_counts'] #type: ignore
    parsed_object_lookup = dict(parsed_object_list) 
       # outcomes_dict['handled_errors'] = parsed_to_dict['handled_errors']
       # outcomes_dict['failed_paras_ind'] = parsed_to_dict['failed_paras_ind']
-   outcomes_dict = monolith_root_and_lemma_processor(parsed_object_list,parsed_to_dict['char_counts'], verbose = True)
+   outcomes_dict = monolith_root_and_lemma_processor(parsed_object_list,parsed_to_dict['char_counts']) #verbose = True
    # with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
    #    pickle.dump(outcomes_dict, file)
 
    # parsed_object_list = outcomes_dict['parsed_object_list']
    # para_text_lookup = outcomes_dict['para_text_lookup'] 
-   root_ind_list = outcomes_dict['root_ind_list'] 
-   subroot_ind_list = outcomes_dict['subroot_ind_list'] 
-   lemma_ind_list = outcomes_dict['lemma_ind_list'] 
-   # root_and_lemma_one_line = outcomes_dict['root_and_lemma_one_line'] 
-   root_lookup = outcomes_dict['root_lookup'] 
-   lemma_lookup = outcomes_dict['lemma_lookup'] 
+   # root_ind_list = outcomes_dict['root_ind_list'] 
+   # subroot_ind_list = outcomes_dict['subroot_ind_list'] 
+   # lemma_ind_list = outcomes_dict['lemma_ind_list'] 
+   # # root_and_lemma_one_line = outcomes_dict['root_and_lemma_one_line'] 
+   # root_lookup = outcomes_dict['root_lookup'] 
+   # lemma_lookup = outcomes_dict['lemma_lookup'] 
    
 
    df = create_sized_dataframe(parsed_object_list, len(parsed_object_list)) #doc_para_count to have nan where failed paras were
@@ -228,7 +228,6 @@ if __name__ == '__main__':
       'root': {'docxFeature': 'run_font_size_pt',
                'strSummary':'fontSize_12.0', 
                'value':12.0,
-               # 'permissive_root_contents': permissive_root_contents, #TODO allow regex within the feature extraction method
                },
       # 'subroot': {'docxFeature': 'run_font_size_pt',
       #          'strSummary':'fontSize_12.0', 
@@ -244,10 +243,9 @@ if __name__ == '__main__':
                'value':True},
       }
 
-   # df['paragraphIndex'].apply(lambda x: parsed_object_lookup[x].cleaner() if not np.isnan(x) else np.nan)
+   
    hierarchy_categories = ['root', 'lemma'] #subroot is an exclusive subclass of root as lexically defined here
    frames_dct: Dict['str',pd.DataFrame] = {}
-   # for cate in hierarchy_categories:
    for target in hierarchy_categories:
       targetdf = df['paragraphIndex'].apply( #type: ignore
          lambda x: extract_features(parsed_object_lookup[x],featureConfig[target]) if not np.isnan(x) else np.nan).apply(pd.Series)
@@ -267,10 +265,7 @@ if __name__ == '__main__':
          frames_dct['root_subpiece'].columns = frames_dct['root_subpiece'].columns.str.replace('is_root', 'is_root_subpiece')
       frames_dct[target] = targetdf.copy()
 
-   # frames_dct['subroot'] = frames_dct['subroot'][frames_dct['subroot'][]]
-
-   # temp_df = temp_df[temp_df['root_run_text_list'].apply(lambda x: type(x)) == list]
-
+   
    
    # dict_df = targetdf.join(
    #          [frames_dct['subroot'],
@@ -278,6 +273,36 @@ if __name__ == '__main__':
    #          on = 'index',
    #          how = 'outer'
    #          )
-   # [bool(re.search(pattern = root_subpiece_pattern, string = x[0])) if x[0] is not None else None for x in a]
-   # lambda x: bool(re.search(pattern = root_subpiece_pattern, string = x[0])) if x[0] is not None else np.nan
-   # print(dict_df.head())      
+   # print(dict_df.head()) 
+   print('...Preparing Pickle...')
+   rootFrame = frames_dct['root']
+   rootsubpieceFrame = frames_dct['root_subpiece']
+   lemmaFrame = frames_dct['lemma']
+   for k,v in frames_dct.items():
+      print('{:<30s} {}'.format(k, v.shape[0]))
+   entityIndexes = rootFrame.index \
+      .append(rootsubpieceFrame.index)\
+         .append(lemmaFrame.index)
+   num_entities = entityIndexes.shape[0]
+   print('{:<42} {}'.format('num entities in the docx:  ',num_entities))
+   entityIndexes = entityIndexes.drop_duplicates()
+   print('{:<42} {}'.format("num of overlapping entities in the docx:", 
+                                    num_entities - entityIndexes.shape[0]))
+
+   paraFrame = create_sized_dataframe(parsed_object_list, doc_para_count)
+   print('{:<42s} {}'.format("paragraphs in the docx:", 
+                                 paraFrame.shape[0]))
+   paraFrame = paraFrame.drop(index = entityIndexes,axis = 0)
+   print('{:<42} {}'.format("non-entity paragraphs in the docx:", 
+                                 paraFrame.shape[0]))
+   output = (
+      rootFrame,#:pd.DataFrame
+      rootsubpieceFrame, #:pd.DataFrame
+      lemmaFrame, #:pd.DataFrame
+      parsed_object_list, #:List[Tuple[int,Docx_Paragraph_and_Runs]]
+      doc_para_count, #: int = int(parsed_to_dict['total_encountered_paragraphs']) #type: ignore
+      char_counts, #: Counter = parsed_to_dict['char_counts'] #type: ignore
+      parsed_object_lookup #:Dict[int,Docx_Paragraph_and_Runs] = dict(parsed_object_list)
+      )
+   with open('feature_Frames_and_Indexes.pkl', 'wb') as file:
+      pickle.dump(output, file)
