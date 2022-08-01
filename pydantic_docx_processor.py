@@ -201,7 +201,7 @@ if __name__ == '__main__':
    parsed_object_lookup = dict(parsed_object_list) 
       # outcomes_dict['handled_errors'] = parsed_to_dict['handled_errors']
       # outcomes_dict['failed_paras_ind'] = parsed_to_dict['failed_paras_ind']
-   outcomes_dict = monolith_root_and_lemma_processor(parsed_object_list,parsed_to_dict['char_counts']) #verbose = True
+   # outcomes_dict = monolith_root_and_lemma_processor(parsed_object_list,parsed_to_dict['char_counts']) #verbose = True
    # with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
    #    pickle.dump(outcomes_dict, file)
 
@@ -215,9 +215,9 @@ if __name__ == '__main__':
    # lemma_lookup = outcomes_dict['lemma_lookup'] 
    
 
-   df = create_sized_dataframe(parsed_object_list, len(parsed_object_list)) #doc_para_count to have nan where failed paras were
-   df['cleaner_success_outcomes'] = df['paragraphIndex'].apply(lambda x: 
-         parsed_object_lookup[x].cleaner() if not np.isnan(x) else np.nan)
+   cleanerOutcomesDf = create_sized_dataframe(parsed_object_list, doc_para_count) #doc_para_count to have nan where failed paras were
+   cleanerOutcomesDf['cleaner_success_outcomes'] = cleanerOutcomesDf['paragraphIndex'] \
+      .apply(lambda x: parsed_object_lookup[x].cleaner(execute_defaults=True) if not np.isnan(x) else np.nan)
 
    up_alph_chars = [x.upper() for x in char_counts.keys() if x.upper() != x.lower()] #only uppercase alphabetical chars
    root_note_chars = '-+()? ' #characters that encode the author's notes
@@ -243,14 +243,16 @@ if __name__ == '__main__':
                'value':True},
       }
 
-   
+
    hierarchy_categories = ['root', 'lemma'] #subroot is an exclusive subclass of root as lexically defined here
    frames_dct: Dict['str',pd.DataFrame] = {}
    for target in hierarchy_categories:
-      targetdf = df['paragraphIndex'].apply( #type: ignore
+      targetdf = cleanerOutcomesDf.copy()
+      targetdf[[0,1,2,3]] = targetdf['paragraphIndex'].apply( #type: ignore
          lambda x: extract_features(parsed_object_lookup[x],featureConfig[target]) if not np.isnan(x) else np.nan).apply(pd.Series)
-      targetdf.columns = [f'is_{target}', f'{target}_text', f'{target}_mask', f'{target}_run_text_list']
-      targetdf = targetdf[targetdf[f'is_{target}']==True]
+      targetdf.rename(columns = {0:f'is_{target}', 1:f'{target}_text', 2:f'{target}_mask', 3:f'{target}_run_text_list'},inplace=True)
+      #choice point: filtering out untargetted records. Is necessary for current subpiece regex logic below
+      targetdf = targetdf[targetdf[f'is_{target}']==True] #filter for only targetted records
       targetdf.index.name='index'
       targetdf.name = target
       assert isinstance(targetdf,pd.DataFrame)
@@ -262,11 +264,12 @@ if __name__ == '__main__':
                .apply(lambda x: bool(re.search(root_subpiece_pattern, x)))
          frames_dct['root_subpiece'] = targetdf[root_or_subroot_mask]
          targetdf = targetdf[~root_or_subroot_mask]
+         print('subpiece','c',targetdf.shape)
          frames_dct['root_subpiece'].columns = frames_dct['root_subpiece'].columns.str.replace('is_root', 'is_root_subpiece')
       frames_dct[target] = targetdf.copy()
 
    
-   
+   # print(frames_dct['root_subpiece'].head())
    # dict_df = targetdf.join(
    #          [frames_dct['subroot'],
    #          frames_dct['lemma']],
@@ -277,6 +280,7 @@ if __name__ == '__main__':
    print('...Preparing Pickle...')
    rootFrame = frames_dct['root']
    rootsubpieceFrame = frames_dct['root_subpiece']
+
    lemmaFrame = frames_dct['lemma']
    for k,v in frames_dct.items():
       print('{:<30s} {}'.format(k, v.shape[0]))
