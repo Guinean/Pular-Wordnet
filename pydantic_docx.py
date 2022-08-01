@@ -420,7 +420,7 @@ def read_docx(docx_filename:str , output_file: Optional[str] = None, verbose=Fal
    #TODO add control logic for error tolerance/control
    document = Document(docx_filename)
 
-   char_counts: Any = Counter()
+   char_counts: Counter = Counter()
    docx_object_list = []
    parsed_object_list = []
    failed_paras_ind = [] #: List[Optional[Tuple[int,Docx_Paragraph_and_Runs,Any]]] = [] #: List[Optional[Tuple[int,Any,BaseException]]]= []
@@ -453,6 +453,7 @@ def read_docx(docx_filename:str , output_file: Optional[str] = None, verbose=Fal
       print('failed paras: ',len(failed_paras_ind))
    #output logic
    outcomes_dict = {}         
+   outcomes_dict['total_encountered_paragraphs'] = [len(document.paragraphs)]
    outcomes_dict['parsed_object_list'] = parsed_object_list
    outcomes_dict['handled_errors'] = handled_errors
    outcomes_dict['failed_paras_ind'] = failed_paras_ind
@@ -460,14 +461,17 @@ def read_docx(docx_filename:str , output_file: Optional[str] = None, verbose=Fal
    return outcomes_dict
 
 
-def extract_features(entryObj: Docx_Paragraph_and_Runs, featureConfig: Dict[str,Any]) -> Tuple[bool,Optional[str],Optional[List[bool]]]:
-   is_target, (target_mask, run_text), _ = entryObj.single_run_feature_identify(featureConfig)
-   if is_target:
-      text = ''.join(chain(compress(run_text,target_mask))).strip()
-      #TODO control for usecase pulling text from multiple portions of the paragraph
-      return (is_target, text, target_mask)
-   else: 
-      return (False,None,None)
+def extract_features(entryObj: Docx_Paragraph_and_Runs, featureConfig: Dict[str,Any]) -> Union[Tuple[bool,str,List[bool],List[str]],Tuple[bool,bool,bool,bool]]:
+   try:
+      is_target, (target_mask, run_text), _ = entryObj.single_run_feature_identify(featureConfig)
+      if is_target:
+         text = ''.join(chain(compress(run_text,target_mask))).strip()
+         #TODO control for usecase pulling text from multiple portions of the paragraph
+         return (is_target, text, target_mask, run_text)
+      else: 
+         return (False,False,False,False)
+   except Exception as e:
+      raise e
 
 if __name__ == '__main__':
    # docx_filename = "Fula_Dictionary-repaired.docx"

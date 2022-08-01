@@ -1,15 +1,18 @@
 import pydantic
-from pydantic_docx import Docx_Paragraph_and_Runs, read_docx, closest, pairwise #type:ignore
+from pydantic_docx import Docx_Paragraph_and_Runs, read_docx, closest, pairwise, extract_features #type:ignore
 import re
 import logging
 from itertools import chain, compress
 from typing import Optional, Dict, List, Any, Union, Tuple
 import string
+import pandas as pd
+import numpy as np
 import pickle
+from datetime import datetime
+from collections import Counter
 
 
-
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = False) -> Dict[str,Any]:
    para_text_lookup = {}
@@ -154,29 +157,127 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
    outcomes_dict['char_counts'] = char_counts
    outcomes_dict['normal_para_ind_list'] = normal_para_ind_list
 
-
-
    return outcomes_dict
 
-# def create_frame(content: Dict[str,Any], heirarchy:List[str]):
+def create_sized_dataframe(parsed_object_list: List[Tuple[int,Docx_Paragraph_and_Runs]],size: int) -> pd.DataFrame:
+   doc_para_index = list(range(size))
+   para_indexes = [i for i,p in parsed_object_list]
+   df_doc =  pd.DataFrame(data = doc_para_index, index = doc_para_index, columns = ['docIndex'])
+   df_parsed = pd.DataFrame(data = para_indexes, index = para_indexes, columns = ['paragraphIndex'])
+   
+   df_parsed = df_parsed.join(df_doc, how = 'outer', sort=True)
+   df_parsed = df_parsed[['paragraphIndex']]
+   # df_parsed
+   return df_parsed
 
+def expand_dataframe(df:pd.DataFrame, truth:pd.Series) -> pd.DataFrame:
+   truth.rename('_truth')
+   df = df.join(truth, how = 'outer', sort=True)
+   df.drop('_truth',inplace=True)
+   return df
 
 if __name__ == '__main__':
-   # docx_filename = "Fula_Dictionary-repaired.docx"
-   docx_filename = "pasted_docx page 1.docx"
+   import logging
+   now = datetime.now()
+   current_time = now.strftime("%Y-%m-%d_-_%H-%M-%S")
+   logger_filename = f"logs_and_outputs/{current_time}docxFileParse.log"
+
+   handler = logging.FileHandler(logger_filename, 'w', 'utf-8') 
+   handler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+
+   # logging.setLogRecordFactory(factory)
+   logging.basicConfig(handlers=[handler], level=logging.DEBUG)
+   logger = logging.getLogger()
+
+
+
+   docx_filename = "Fula_Dictionary-repaired.docx"
+   # docx_filename = "pasted_docx page 1.docx"
 
    parsed_to_dict = read_docx(docx_filename)
+   parsed_object_list = parsed_to_dict['parsed_object_list']
+   doc_para_count: int = int(parsed_to_dict['total_encountered_paragraphs']) #type: ignore
+   char_counts: Counter = parsed_to_dict['char_counts'] #type: ignore
+   parsed_object_lookup = dict(parsed_object_list) 
+      # outcomes_dict['handled_errors'] = parsed_to_dict['handled_errors']
+      # outcomes_dict['failed_paras_ind'] = parsed_to_dict['failed_paras_ind']
+   outcomes_dict = monolith_root_and_lemma_processor(parsed_object_list,parsed_to_dict['char_counts'], verbose = True)
+   # with open('parsed_objectClass_outcomes_dict.pkl', 'wb') as file:
+   #    pickle.dump(outcomes_dict, file)
 
-   outcomes_dict = monolith_root_and_lemma_processor(parsed_to_dict['parsed_object_list'],parsed_to_dict['char_counts'])
-   
-   parsed_object_list = outcomes_dict['parsed_object_list'] 
-   para_text_lookup = outcomes_dict['para_text_lookup'] 
+   # parsed_object_list = outcomes_dict['parsed_object_list']
+   # para_text_lookup = outcomes_dict['para_text_lookup'] 
    root_ind_list = outcomes_dict['root_ind_list'] 
    subroot_ind_list = outcomes_dict['subroot_ind_list'] 
    lemma_ind_list = outcomes_dict['lemma_ind_list'] 
-   root_and_lemma_one_line = outcomes_dict['root_and_lemma_one_line'] 
+   # root_and_lemma_one_line = outcomes_dict['root_and_lemma_one_line'] 
    root_lookup = outcomes_dict['root_lookup'] 
    lemma_lookup = outcomes_dict['lemma_lookup'] 
-   char_counts = outcomes_dict['char_counts']
+   
 
+   df = create_sized_dataframe(parsed_object_list, len(parsed_object_list)) #doc_para_count to have nan where failed paras were
+   df['cleaner_success_outcomes'] = df['paragraphIndex'].apply(lambda x: 
+         parsed_object_lookup[x].cleaner() if not np.isnan(x) else np.nan)
 
+   up_alph_chars = [x.upper() for x in char_counts.keys() if x.upper() != x.lower()] #only uppercase alphabetical chars
+   root_note_chars = '-+()? ' #characters that encode the author's notes
+   sub_root_beginnings = '-+('
+   permissive_root_contents = ''.join(list(chain(up_alph_chars,root_note_chars,string.digits)))
+   root_subpiece_pattern = '^['+re.escape(sub_root_beginnings)+']['+re.escape(permissive_root_contents)+']+'
+   featureConfig = {
+      'root': {'docxFeature': 'run_font_size_pt',
+               'strSummary':'fontSize_12.0', 
+               'value':12.0,
+               # 'permissive_root_contents': permissive_root_contents, #TODO allow regex within the feature extraction method
+               },
+      # 'subroot': {'docxFeature': 'run_font_size_pt',
+      #          'strSummary':'fontSize_12.0', 
+      #          'value':12.0,
+      #          # 'root_subpiece_pattern': root_subpiece_pattern, #TODO allow regex within the feature extraction method
+      #          # 'permissive_root_contents': permissive_root_contents, #TODO allow regex within the feature extraction method
+      #          },
+      'lemma': {'docxFeature': 'run_bold',
+               'strSummary':'fontBold', 
+               'value':True},
+      'lemmaPOS': {'docxFeature': 'run_italic',
+               'strSummary':'fontItalic', 
+               'value':True},
+      }
+
+   # df['paragraphIndex'].apply(lambda x: parsed_object_lookup[x].cleaner() if not np.isnan(x) else np.nan)
+   hierarchy_categories = ['root', 'lemma'] #subroot is an exclusive subclass of root as lexically defined here
+   frames_dct: Dict['str',pd.DataFrame] = {}
+   # for cate in hierarchy_categories:
+   for target in hierarchy_categories:
+      targetdf = df['paragraphIndex'].apply( #type: ignore
+         lambda x: extract_features(parsed_object_lookup[x],featureConfig[target]) if not np.isnan(x) else np.nan).apply(pd.Series)
+      targetdf.columns = [f'is_{target}', f'{target}_text', f'{target}_mask', f'{target}_run_text_list']
+      targetdf = targetdf[targetdf[f'is_{target}']==True]
+      targetdf.index.name='index'
+      targetdf.name = target
+      assert isinstance(targetdf,pd.DataFrame)
+      # frames_dct[target] = targetdf.copy()
+      if target == 'root':
+         root_or_subroot_mask = targetdf[ #type: ignore
+               'root_run_text_list'] \
+               .apply(lambda x: x[0]) \
+               .apply(lambda x: bool(re.search(root_subpiece_pattern, x)))
+         frames_dct['root_subpiece'] = targetdf[root_or_subroot_mask]
+         targetdf = targetdf[~root_or_subroot_mask]
+         frames_dct['root_subpiece'].columns = frames_dct['root_subpiece'].columns.str.replace('is_root', 'is_root_subpiece')
+      frames_dct[target] = targetdf.copy()
+
+   # frames_dct['subroot'] = frames_dct['subroot'][frames_dct['subroot'][]]
+
+   # temp_df = temp_df[temp_df['root_run_text_list'].apply(lambda x: type(x)) == list]
+
+   
+   # dict_df = targetdf.join(
+   #          [frames_dct['subroot'],
+   #          frames_dct['lemma']],
+   #          on = 'index',
+   #          how = 'outer'
+   #          )
+   # [bool(re.search(pattern = root_subpiece_pattern, string = x[0])) if x[0] is not None else None for x in a]
+   # lambda x: bool(re.search(pattern = root_subpiece_pattern, string = x[0])) if x[0] is not None else np.nan
+   # print(dict_df.head())      
