@@ -303,12 +303,12 @@ if __name__ == '__main__':
    print('{:<42} {}'.format("num of overlapping entities in the docx:", 
                                     num_entities - entityIndexes.shape[0]))
 
-   paraFrame = create_sized_dataframe(parsed_object_list, doc_para_count)
+   nonentityParaFrame = create_sized_dataframe(parsed_object_list, doc_para_count)
    print('{:<42s} {}'.format("paragraphs in the docx:", 
-                                 paraFrame.shape[0]))
-   paraFrame = paraFrame.drop(index = entityIndexes,axis = 0)
+                                 nonentityParaFrame.shape[0]))
+   nonentityParaFrame = nonentityParaFrame.drop(index = entityIndexes,axis = 0)
    print('{:<42} {}'.format("non-entity paragraphs in the docx:", 
-                                 paraFrame.shape[0]))
+                                 nonentityParaFrame.shape[0]))
    output = (
       parsed_object_list, #:List[Tuple[int,Docx_Paragraph_and_Runs]]
       parsed_object_lookup, #:Dict[int,Docx_Paragraph_and_Runs] = dict(parsed_object_list)
@@ -317,7 +317,7 @@ if __name__ == '__main__':
       rootFrame,#:pd.DataFrame
       rootsubpieceFrame, #:pd.DataFrame
       lemmaFrame, #:pd.DataFrame
-      paraFrame, #pd.DataFrame
+      nonentityParaFrame, #pd.DataFrame
       cleanerOutcomesDf #pd.DataFrame
       )
    print(cleanerOutcomesDf.head())
