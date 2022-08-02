@@ -364,14 +364,18 @@ class Docx_Paragraph_and_Runs (BaseModel):
          para_enumeration = getattr(self, 'paragraph_enumeration',None)
          assert para_enumeration is not None, 'paragraph did not have an enumeration value'
 
-      def remove_para_leading_whitespace(start_ind : int = 0): #run 
-         # try: #expect to fail when reaches the end of the list
+      def remove_para_leading_whitespace(start_ind : int = 0) -> bool: #run 
+         run_text_list : List[str] = getattr(self, 'run_text',[''])
+         num_runs = len(run_text_list)
+
+         #control for all-whitespace paragraph
          para_text : Optional[str] = getattr(self, 'para_text',None)
          if isinstance(para_text,str):
             if len(para_text.strip()) == 0: #if para's text is ONLY whitespace
+               logger.info(f'paragraph#{para_enumeration} with text "{para_text}" and runs {run_text_list} is all whitespace')
                return False
-         run_text_list : List[str] = getattr(self, 'run_text',[''])
-         num_runs = len(run_text_list)
+         else:
+            raise RuntimeError(f'for paragraph#{para_enumeration}, the paragraph text attribute was not a string type')
 
          ind = start_ind
          droppable_runs : List[int] = [] #TODO this dropable section doesnt seem to be working correctly.
@@ -395,9 +399,12 @@ class Docx_Paragraph_and_Runs (BaseModel):
                raise RuntimeError(f'for paragraph#{para_enumeration}, all runs purported droppable whitespace, but para_text purported not')
             self.modify_run_lists(drop_runs = droppable_runs) #this removes whole runs, not just modifying the run_text.
             logger.info(f'paragraph#{para_enumeration} with text "{para_text}" tried to drop a run whitespace')
+         return True
 
       if execute_defaults:
-         remove_para_leading_whitespace()
+         cleaning_successful = remove_para_leading_whitespace()
+         if not cleaning_successful:
+            return False
          self.modify_run_lists(merge_runs = True)
 
       return True
