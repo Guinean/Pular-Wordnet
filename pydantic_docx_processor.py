@@ -162,19 +162,27 @@ def monolith_root_and_lemma_processor(parsed_object_list, char_counts,verbose = 
 def create_sized_dataframe(parsed_object_list: List[Tuple[int,Docx_Paragraph_and_Runs]],size: int) -> pd.DataFrame:
    doc_para_index = list(range(size))
    para_indexes = [i for i,p in parsed_object_list]
-   df_doc =  pd.DataFrame(data = doc_para_index, index = doc_para_index, columns = ['docIndex'])
+   df_doc =  pd.DataFrame(data = doc_para_index, index = doc_para_index, columns = ['index'])
    df_parsed = pd.DataFrame(data = para_indexes, index = para_indexes, columns = ['paragraphIndex'])
    
    df_parsed = df_parsed.join(df_doc, how = 'outer', sort=True)
    df_parsed = df_parsed[['paragraphIndex']]
+   df_parsed.index.name = 'index'
    # df_parsed
    return df_parsed
 
-def expand_dataframe(df:pd.DataFrame, truth:pd.Series) -> pd.DataFrame:
-   truth.rename('_truth')
-   df = df.join(truth, how = 'outer', sort=True)
-   df.drop('_truth',inplace=True)
-   return df
+def expand_dataframe(df:pd.DataFrame, target:Union[pd.Series,int]) -> pd.DataFrame:
+   if isinstance(target,pd.Series):
+      target.rename('_target')
+      df = df.join(target, how = 'outer', sort=True)
+      df.drop('_target',inplace=True)
+      return df
+   elif isinstance(target,int):
+      new_index = list(range(target))
+      fillseries =  pd.Series(data = new_index, index = new_index, name = 'index')
+      df = df.join(fillseries, how = 'outer', sort=True)
+      return df
+   else: raise NotImplementedError('no target df sizing condition was provided. Provide a target series or target integer to fill to.')
 
 if __name__ == '__main__':
    import logging
@@ -247,24 +255,26 @@ if __name__ == '__main__':
    hierarchy_categories = ['root', 'lemma'] #subroot is an exclusive subclass of root as lexically defined here
    frames_dct: Dict['str',pd.DataFrame] = {}
    for target in hierarchy_categories:
-      targetdf = cleanerOutcomesDf.copy()
+      targetdf = create_sized_dataframe(parsed_object_list,doc_para_count)
       targetdf[[0,1,2,3]] = targetdf['paragraphIndex'].apply( #type: ignore
          lambda x: extract_features(parsed_object_lookup[x],featureConfig[target]) if not np.isnan(x) else np.nan).apply(pd.Series)
-      targetdf.rename(columns = {0:f'is_{target}', 1:f'{target}_text', 2:f'{target}_mask', 3:f'{target}_run_text_list'},inplace=True)
+      # targetdf.rename(columns = {0:f'is_{target}', 1:f'{target}_text', 2:f'{target}_mask', 3:f'{target}_run_text_list'},inplace=True)
+      targetdf.rename(columns = {0:'is', 1:'text', 2:'mask', 3:'run_text_list'},inplace=True)
       #choice point: filtering out untargetted records. Is necessary for current subpiece regex logic below
-      targetdf = targetdf[targetdf[f'is_{target}']==True] #filter for only targetted records
+      # targetdf = targetdf[targetdf[f'is_{target}']==True] #filter for only targetted records
+      targetdf = targetdf[targetdf['is']==True] #filter for only targetted records
       targetdf.index.name='index'
       targetdf.name = target
       assert isinstance(targetdf,pd.DataFrame)
       # frames_dct[target] = targetdf.copy()
       if target == 'root':
          root_or_subroot_mask = targetdf[ #type: ignore
-               'root_run_text_list'] \
+               'run_text_list'] \
                .apply(lambda x: x[0]) \
                .apply(lambda x: bool(re.search(root_subpiece_pattern, x)))
          frames_dct['root_subpiece'] = targetdf[root_or_subroot_mask]
          targetdf = targetdf[~root_or_subroot_mask]
-         print('subpiece','c',targetdf.shape)
+         # print('subpiece','c',targetdf.shape)
          frames_dct['root_subpiece'].columns = frames_dct['root_subpiece'].columns.str.replace('is_root', 'is_root_subpiece')
       frames_dct[target] = targetdf.copy()
 
@@ -300,13 +310,16 @@ if __name__ == '__main__':
    print('{:<42} {}'.format("non-entity paragraphs in the docx:", 
                                  paraFrame.shape[0]))
    output = (
+      parsed_object_list, #:List[Tuple[int,Docx_Paragraph_and_Runs]]
+      parsed_object_lookup, #:Dict[int,Docx_Paragraph_and_Runs] = dict(parsed_object_list)
+      doc_para_count, #: int = int(parsed_to_dict['total_encountered_paragraphs']) #type: ignore
+      char_counts, #: Counter = parsed_to_dict['char_counts'] #type: ignore
       rootFrame,#:pd.DataFrame
       rootsubpieceFrame, #:pd.DataFrame
       lemmaFrame, #:pd.DataFrame
-      parsed_object_list, #:List[Tuple[int,Docx_Paragraph_and_Runs]]
-      doc_para_count, #: int = int(parsed_to_dict['total_encountered_paragraphs']) #type: ignore
-      char_counts, #: Counter = parsed_to_dict['char_counts'] #type: ignore
-      parsed_object_lookup #:Dict[int,Docx_Paragraph_and_Runs] = dict(parsed_object_list)
+      paraFrame, #pd.DataFrame
+      cleanerOutcomesDf #pd.DataFrame
       )
+   print(cleanerOutcomesDf.head())
    with open('feature_Frames_and_Indexes.pkl', 'wb') as file:
       pickle.dump(output, file)
