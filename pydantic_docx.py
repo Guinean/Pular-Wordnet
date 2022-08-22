@@ -256,11 +256,21 @@ class Docx_Paragraph_and_Runs (BaseModel):
          text_regex_at_feature = params.get('text_regex_at_feature',False)
          regex_mask: List[bool] = []
          regex_matches: List[Optional[str]] = []
-
+         position_requirement = params.get('position_requirement',False)
       values_from_runs: List[Optional[Union[float,bool]]] = getattr(self,feature,[None]) 
       value_mask: List[bool] = [True if x == params['value'] else False for x in values_from_runs]
       
-      if any(value_mask):
+      position_check = any(value_mask)
+      if position_requirement:
+         if not isinstance(position_requirement,int):
+            raise NotImplementedError('only single run positions are possible to enforce currently. Must pass an int for position index')
+         try:
+            position_check = value_mask[position_requirement]
+         except:
+            position_check=False
+            pass
+
+      if position_check:
          # print('text and value mask: ',run_texts,value_mask)
          # if text_regex_at_feature:
             # pattern = text_regex_at_feature
