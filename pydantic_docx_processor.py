@@ -186,6 +186,9 @@ def expand_dataframe(df:pd.DataFrame, target:Union[pd.Series,int]) -> pd.DataFra
 
 if __name__ == '__main__':
    import logging
+   import os
+   script_dir = os.path.dirname(__file__)
+
    now = datetime.now()
    current_time = now.strftime("%Y-%m-%d_-_%H-%M-%S")
    logger_filename = f"logs_and_outputs/{current_time}docxFileParse.log"
@@ -199,8 +202,10 @@ if __name__ == '__main__':
 
 
 
-   docx_filename = "Fula_Dictionary-repaired.docx"
-   # docx_filename = "pasted_docx page 1.docx"
+   # docx_filename = os.path.join(script_dir, "../test_data/pasted_docx page 1.docx")
+   # docx_filename = os.path.join(script_dir, "../test_data/Fula_Dictionary-repaired.docx")
+   # docx_filename = "test_data/pasted_docx page 1.docx"
+   docx_filename = "test_data/Fula_Dictionary-repaired.docx"
 
    parsed_to_dict = read_docx(docx_filename)
    parsed_object_list = parsed_to_dict['parsed_object_list']
@@ -324,5 +329,6 @@ if __name__ == '__main__':
       cleanerOutcomesDf #pd.DataFrame
       )
    print(cleanerOutcomesDf.head())
-   with open('feature_Frames_and_Indexes.pkl', 'wb') as file:
+   pickle_filename = os.path.join(script_dir, "pickled_results/feature_Frames_and_Indexes.pkl")
+   with open(pickle_filename, 'wb') as file:
       pickle.dump(output, file)

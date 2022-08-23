@@ -491,8 +491,12 @@ def extract_features(entryObj: Docx_Paragraph_and_Runs, featureConfig: Dict[str,
       raise e
 
 if __name__ == '__main__':
-   # docx_filename = "Fula_Dictionary-repaired.docx"
-   docx_filename = "pasted_docx page 1.docx"
+   # import os
+   # script_dir = os.path.dirname(__file__)
+   # docx_filename = os.path.join(script_dir, "../test_data/pasted_docx page 1.docx")
+   # # docx_filename = os.path.join(script_dir, "../test_data/Fula_Dictionary-repaired.docx")
+   docx_filename = "test_data/pasted_docx page 1.docx"
+   # docx_filename = "test_data/Fula_Dictionary-repaired.docx"
    parsed_to_dict = read_docx(docx_filename)
    print(len(parsed_to_dict))
    
