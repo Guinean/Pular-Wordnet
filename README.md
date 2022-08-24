@@ -4,7 +4,7 @@ Capstone Project for UMICH Data Science Masters Degree
 
 ## What's going on here?
 
-This is the repository for my Capstone project. 
+This is the repository for my Capstone project.
 The goal of this repository is to create NLP tools to assist in collecting / labeling data for under-resourced languages, specifically in West Africa.
 
 ## What might this become?
