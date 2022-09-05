@@ -3,6 +3,5 @@
 
 # ignore ALL files in ANY directory named temp
 logs_and_outputs/
-
 .pular_venv/
-
+test_data/Fula_Dictionary-repaired.docx
