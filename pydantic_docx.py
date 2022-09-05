@@ -261,7 +261,7 @@ class Docx_Paragraph_and_Runs (BaseModel):
       value_mask: List[bool] = [True if x == params['value'] else False for x in values_from_runs]
       
       position_check = any(value_mask)
-      if position_requirement:
+      if position_requirement is not False:
          if not isinstance(position_requirement,int):
             raise NotImplementedError('only single run positions are possible to enforce currently. Must pass an int for position index')
          try:

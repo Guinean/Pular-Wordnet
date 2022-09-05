@@ -241,7 +241,7 @@ if __name__ == '__main__':
       'root': {'docxFeature': 'run_font_size_pt',
                'strSummary':'fontSize_12.0', 
                'value':12.0,
-               # 'position_requirement':0,
+               # 'position_requirement':0, #Enabling this should be fine, but risky to lose this without checking the exceptions
                },
       # 'subroot': {'docxFeature': 'run_font_size_pt',
       #          'strSummary':'fontSize_12.0', 
@@ -252,7 +252,7 @@ if __name__ == '__main__':
       'lemma': {'docxFeature': 'run_bold',
                'strSummary':'fontBold', 
                'value':True,
-               # 'position_requirement':0,
+               # 'position_requirement':0,#enabling this will cause all co-declared lemmas to not be classified as lemmas. Distinguishing false from co-declared requires better relational information
                },
       # 'lemmaPOS': {'docxFeature': 'run_italic',
       #          'strSummary':'fontItalic', 
@@ -317,6 +317,13 @@ if __name__ == '__main__':
    nonentityParaFrame = nonentityParaFrame.drop(index = entityIndexes,axis = 0)
    print('{:<42} {}'.format("non-entity paragraphs in the docx:", 
                                  nonentityParaFrame.shape[0]))
+
+   print('{:<42} {}'.format("Purported Roots in the docx:", 
+                                 rootFrame.shape[0]))
+   print('{:<42} {}'.format("Purported root-subpieces in the docx:", 
+                                 rootsubpieceFrame.shape[0]))
+   print('{:<42} {}'.format("Purported lemmas in the docx:", 
+                                 lemmaFrame.shape[0]))
    output = (
       parsed_object_list, #:List[Tuple[int,Docx_Paragraph_and_Runs]]
       parsed_object_lookup, #:Dict[int,Docx_Paragraph_and_Runs] = dict(parsed_object_list)
