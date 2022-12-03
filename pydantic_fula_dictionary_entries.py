@@ -174,7 +174,8 @@ class dict_entry(pydantic.BaseModel):
             used_run_mask = [any(run) for run in list(zip(used_run_mask,root_mask))]
             rootLine_runs = False
          newValues['root_subpiece'] = root_subpiece_text
-         newValues['root_metadata'] = {'root_subpiece_index': root_index, 'root_subpiece_runs':rootLine_runs}
+         for k,v in {'root_subpiece_index': root_index, 'root_subpiece_runs':rootLine_runs}.items():
+            newValues['root_metadata'][k] = v
       except AssertionError as e:
          newValues['root_subpiece'] = False
       except Exception as e:
