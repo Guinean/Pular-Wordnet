@@ -5,7 +5,16 @@
 		}
 	],
 	"settings": {
-		"python.envFile": "${workspaceFolder}/.pular_venv"
-		
-	}
+			"python.envFile": "${workspaceFolder}/.pular_venv",
+			"terminal.integrated.profiles.windows": {
+				"PowerShell Pular-Wordnet": { 
+					"source": "PowerShell", 
+					"icon": "terminal-powershell", 
+					"args": ["-ExecutionPolicy", "Bypass"] }},
+			"terminal.integrated.defaultProfile.windows": "PowerShell Pular-Wordnet",
+			// "python.defaultInterpreterPath": "C:/Users/peter/Workbooks/Repos/Pular-Wordnet/.pular_venv/Scripts/python.exe",   
+			"python.defaultInterpreterPath": ".pular_venv/Scripts/activate",
+			"python.terminal.activateEnvInCurrentTerminal": true,  
+			"python.terminal.activateEnvironment": true,
+		}
 }
